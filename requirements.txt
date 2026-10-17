@@ -1,0 +1,6 @@
+mediapipe
+opencv-python
+websockets
+numpy
+librosa
+pygame
