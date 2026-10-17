@@ -1,184 +1,378 @@
-# MotionMirror
+# MotionMirror 🎭
 
-MotionMirror is a local real-time motion-mirroring prototype. A Python process captures webcam frames and estimates body landmarks with MediaPipe. It streams pose data over WebSocket to a Vite/Three.js frontend, which retargets the landmarks onto an FBX avatar.
+### Real-Time Webcam Motion Mirroring with Python, MediaPipe, Three.js & WebSockets
 
-> **Project status:** prototype/demo. Pose estimation and avatar retargeting are approximate; this is not a motion-capture system and cannot guarantee an exact copy of a person's movements. Tracking quality depends on camera placement, lighting, visibility, the pose model, and how well the avatar's skeleton matches the expected rig.
+MotionMirror is a local real-time motion-mirroring prototype that tracks a person's body movements through a webcam and retargets estimated pose landmarks onto a 3D avatar in the browser.
 
-## Features
+Built using **Python, MediaPipe, WebSockets, Vite, and Three.js**, the project connects real-time pose estimation with 3D avatar animation.
 
-- Webcam pose tracking with MediaPipe Pose Landmarker.
-- Live landmark streaming and a compressed camera preview over WebSocket.
-- Three.js browser scene with an FBX avatar and live pose retargeting.
-- Skeleton, tracking status, and camera preview for local debugging.
-- Separate experimental scripts for movement detection and music beat analysis.
+> **Project Status:** Prototype / Demo
+> Motion tracking and avatar retargeting are approximate. This project is not a professional motion-capture system and does not guarantee an exact reproduction of human movement.
 
-## How it works
+---
 
-1. [`motion_server.py`](./motion_server.py) reads frames from the local webcam and runs the MediaPipe pose model.
-2. The server streams 2D/world landmark messages and preview images at `ws://localhost:8765`.
-3. The Vite frontend connects to the local WebSocket server and renders the avatar in the browser at `http://localhost:5173`.
-4. [`frontend/src/retarget.js`](./frontend/src/retarget.js) maps selected MediaPipe landmarks to Mixamo-style avatar bones.
+## ✨ Features
 
-The server and the browser are intended to run on the same computer. Webcam frames and landmarks are streamed locally; this project does not include a hosted backend.
+- 🎥 **Real-Time Pose Tracking** — Estimates body landmarks using MediaPipe Pose Landmarker.
+- 🦴 **3D Avatar Retargeting** — Maps selected body landmarks to Mixamo-style avatar bones.
+- 🔄 **Live WebSocket Communication** — Streams pose data between the Python server and browser.
+- 📷 **Camera Preview** — Displays a compressed webcam preview for debugging.
+- 🧍 **Skeleton Visualization** — Helps inspect body landmarks and tracking behavior.
+- 🌐 **Browser-Based 3D Scene** — Renders the avatar using Three.js.
+- 🎵 **Experimental Beat Detection** — Includes a separate script for analyzing music beats.
+- 💻 **Local Execution** — Designed to run on your own computer without a hosted backend.
 
-## Requirements
+---
 
-- Windows 10/11 (the included launcher is a Windows batch file)
-- Python 3.10 or newer, with a version supported by the installed MediaPipe release
-- Node.js and npm (use a current LTS release)
-- A webcam and permission for Python to access it
-- A browser with WebGL support
+## 🛠️ Tech Stack
 
-## Setup
+| Technology | Purpose |
+|---|---|
+| Python | Webcam processing and pose estimation |
+| MediaPipe | Human body landmark detection |
+| OpenCV | Webcam frame capture and image processing |
+| WebSockets | Real-time communication |
+| NumPy | Numerical operations |
+| JavaScript | Frontend logic and pose retargeting |
+| Three.js | 3D rendering and avatar visualization |
+| Vite | Frontend development server |
+| FBX | 3D avatar and animation assets |
+| Librosa | Experimental audio and beat analysis |
+| Pygame | Optional audio-related experiments |
 
-Open PowerShell or Command Prompt in the repository root.
+---
 
-### 1. Create a Python environment and install packages
+## 🏗️ System Architecture
+
+```text
+          ┌──────────────────────┐
+          │       Webcam         │
+          └──────────┬───────────┘
+                     │
+                     ▼
+          ┌──────────────────────┐
+          │ Python + OpenCV      │
+          │ Frame Capture        │
+          └──────────┬───────────┘
+                     │
+                     ▼
+          ┌──────────────────────┐
+          │ MediaPipe Pose       │
+          │ Landmark Estimation  │
+          └──────────┬───────────┘
+                     │
+                     ▼
+          ┌──────────────────────┐
+          │ WebSocket Server     │
+          │ localhost:8765       │
+          └──────────┬───────────┘
+                     │
+                     ▼
+          ┌──────────────────────┐
+          │ Vite + Three.js      │
+          │ Browser Frontend     │
+          └──────────┬───────────┘
+                     │
+                     ▼
+          ┌──────────────────────┐
+          │ 3D Avatar Retargeting│
+          │ Live Pose Updates    │
+          └──────────────────────┘
+```
+
+### How It Works
+
+1. **Capture:** Python captures video frames from the webcam using OpenCV.
+2. **Detect:** MediaPipe estimates body landmarks from the captured frames.
+3. **Stream:** The Python server sends pose information and camera preview data over WebSockets.
+4. **Connect:** The Vite frontend connects to the local server.
+5. **Retarget:** The frontend maps selected landmarks to the avatar's compatible skeleton.
+6. **Render:** Three.js updates and displays the avatar in the browser.
+
+The Python server and frontend are intended to run on the same computer. Webcam frames and pose data are streamed locally.
+
+---
+
+## 📁 Project Structure
+
+```text
+MotionMirror/
+├── models/
+│   └── pose_landmarker_lite.task
+├── songs/
+│   └── garba.mp3
+├── frontend/
+│   ├── public/
+│   │   ├── models/
+│   │   │   └── avatar.fbx
+│   │   ├── animations/
+│   │   ├── songs/
+│   │   └── beat_times.json
+│   ├── src/
+│   │   ├── main.js
+│   │   └── retarget.js
+│   ├── package.json
+│   └── package-lock.json
+├── motion_server.py
+├── movement_detector.py
+├── beat_detector.py
+├── main.py
+├── requirements.txt
+├── start.bat
+├── package.json
+├── package-lock.json
+├── .gitignore
+└── README.md
+```
+
+### Important Files
+
+- `motion_server.py` — Runs webcam capture, pose estimation, and the WebSocket server.
+- `frontend/src/main.js` — Initializes the browser scene, loads the avatar, and manages frontend behavior.
+- `frontend/src/retarget.js` — Maps estimated body landmarks to avatar bones.
+- `main.py` — Runs a simple webcam pose viewer.
+- `movement_detector.py` — Contains experimental movement-detection logic.
+- `beat_detector.py` — Analyzes music to estimate beat timings.
+- `start.bat` — Launches the local server and frontend on Windows.
+- `models/pose_landmarker_lite.task` — MediaPipe pose model asset.
+
+---
+
+## ⚙️ Requirements
+
+Before running MotionMirror, install or prepare the following:
+
+- Windows 10 or Windows 11
+- Python 3.10 or newer, compatible with the selected MediaPipe version
+- Node.js and npm
+- A working webcam
+- A modern browser with WebGL support
+- A compatible FBX avatar with Mixamo-style bone names
+
+**Note:** Python and MediaPipe compatibility depends on the installed package versions. Use a supported Python version if installation fails.
+
+---
+
+## 🚀 Installation and Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/BETTER678/MirrorMotion.git
+cd MirrorMotion
+```
+
+### 2. Create a Python Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+Upgrade pip:
 
 ```bat
-python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
+```
+
+### 3. Install Python Dependencies
+
+```bat
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-[`requirements.txt`](./requirements.txt) lists the Python packages used by the project. `mediapipe`, `opencv-python`, and `websockets` support the live pose server; `numpy`, `librosa`, and `pygame` support the optional audio/beat scripts.
+The Python dependencies include packages used for pose tracking, webcam processing, WebSocket communication, and optional audio experiments.
 
-### 2. Install frontend dependencies
+### 4. Install Frontend Dependencies
 
-```bat
+```bash
 cd frontend
 npm install
 cd ..
 ```
 
-The frontend package manifest and lockfile are in [`frontend/`](./frontend/).
-Frontend dependencies are installed separately with npm; they are not listed in the Python `requirements.txt`.
+The frontend uses its own `package.json` and lockfile.
 
-## Run
+---
 
-### Windows launcher
+## ▶️ Run the Application
 
-From the repository root:
+### Option 1: Use the Windows Launcher
+
+From the repository root, run:
 
 ```bat
 start.bat
 ```
 
-The launcher starts the webcam pose server and Vite development server in separate windows, then opens the frontend in a browser.
+The launcher is intended to start the Python pose server and Vite development server in separate windows and open the frontend in a browser.
 
-### Run services manually
+### Option 2: Start the Services Manually
 
-Start the pose server in one terminal from the repository root:
+**Terminal 1 — Python pose server**
+
+Run this command from the repository root:
 
 ```bat
 .\.venv\Scripts\python.exe motion_server.py
 ```
 
-Start the frontend in a second terminal:
+**Terminal 2 — Frontend**
 
-```bat
+```bash
 cd frontend
 npm run dev
 ```
 
-Open the local URL printed by Vite (normally `http://localhost:5173`). Keep both processes running while using the app.
+Open the local URL printed by Vite, normally:
 
-## Camera and tracking tips
+[http://localhost:5173](http://localhost:5173/)
 
-- Put the camera far enough away to keep your whole body in frame, including feet.
-- Use even, bright lighting and avoid strong backlighting.
-- Keep the camera stable and avoid motion blur.
-- For turns, keep as much of the body visible as possible. A single front-facing webcam may lose or confuse landmarks when body parts overlap or the person turns fully away.
-- Running/jogging capture depends on frame rate, available space, and the model's ability to keep landmarks visible. This prototype estimates pose from individual video frames; it does not reconstruct exact world position, contact, or foot placement.
-- The avatar needs a compatible skeleton. The current retargeter expects Mixamo-style bone names; other rigs may need their own mapping.
+Keep both processes running while using the application.
 
-## Optional scripts
+The WebSocket server normally listens at:
 
-### Movement detector prototype
+`ws://localhost:8765`
 
-```bat
-.\.venv\Scripts\python.exe movement_detector.py
-```
+---
 
-### Simple webcam pose viewer
+## 📸 Camera Setup and Tracking Tips
+
+For better tracking results:
+
+- Position the camera far enough away to capture your full body, including your feet.
+- Use bright, even lighting.
+- Keep the camera stable and minimize motion blur.
+- Avoid backgrounds and lighting conditions that make your body difficult to distinguish.
+- Keep your arms and legs visible whenever possible.
+- Avoid turning completely away from a single front-facing camera.
+
+### Avatar Compatibility
+
+The retargeting logic expects Mixamo-style bone names. If your avatar uses a different skeleton, the bone mapping may need to be adjusted.
+
+### Current Limitations
+
+- Pose estimation may become unreliable when body parts overlap.
+- Rapid movements can reduce tracking accuracy.
+- A single webcam cannot reliably reconstruct every 3D movement or exact foot placement.
+- Avatar proportions and skeleton structure affect retargeting quality.
+- The current prototype does not provide guaranteed motion-capture accuracy.
+- Music beat detection is a separate experiment and is not currently synchronized with the live avatar motion server.
+
+---
+
+## 🧪 Optional Experiments
+
+### Simple Webcam Pose Viewer
 
 ```bat
 .\.venv\Scripts\python.exe main.py
 ```
 
-### Analyze the demo song's beats
+### Movement Detection Prototype
+
+```bat
+.\.venv\Scripts\python.exe movement_detector.py
+```
+
+### Music Beat Analysis
+
+Place the demo song at `songs/garba.mp3`, then run:
 
 ```bat
 .\.venv\Scripts\python.exe beat_detector.py
 ```
 
-The beat detector uses `songs/garba.mp3` and writes beat timings to `beat_times.npy` and `frontend/public/beat_times.json`. These scripts are separate experiments; the current live motion server does not synchronize the avatar to music.
+The beat detector is designed to generate:
 
-## Repository layout
+- `beat_times.npy`
+- `frontend/public/beat_times.json`
 
-```text
-MirrorMotion/
-├── README.md
-├── requirements.txt           # Python package dependencies
-├── .gitignore
-├── main.py                    # Simple webcam pose viewer
-├── motion_server.py           # Webcam pose server and WebSocket stream
-├── movement_detector.py       # Movement detection experiment
-├── beat_detector.py           # Music beat analysis experiment
-├── start.bat                  # Windows launcher
-├── package.json               # Root JavaScript dependency manifest
-├── package-lock.json          # Root JavaScript lockfile
-├── models/
-│   └── pose_landmarker_lite.task
-├── songs/
-│   └── garba.mp3
-└── frontend/
-    ├── package.json
-    ├── package-lock.json
-    ├── public/
-    │   ├── models/avatar.fbx
-    │   ├── animations/
-    │   ├── songs/
-    │   └── beat_times.json
-    └── src/
-        ├── main.js
-        └── retarget.js
-```
+These outputs are used for experimentation with music timing. Their availability depends on the script completing successfully.
 
-The model, avatar, audio, and animation files are runtime assets and are intentionally not excluded by `.gitignore`. Before publishing them, verify that you have permission to redistribute each asset.
+---
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-### Webcam unavailable
+### Webcam Not Detected
 
-- Allow camera access for desktop apps in Windows privacy settings.
-- Close other applications that may be using the camera.
-- Check the pose-server terminal for webcam errors.
+- Check Windows camera privacy permissions.
+- Close other applications that may be using the webcam.
+- Run the Python server separately and inspect its terminal output.
 
-### Frontend cannot connect to the pose server
+### WebSocket Connection Failed
 
 - Confirm that `motion_server.py` is running.
-- Check that port `8765` is not already occupied by another process.
-- Keep the browser and server on the same computer; the frontend currently connects to `localhost`.
+- Check whether port `8765` is already in use.
+- Verify that the frontend connects to `ws://localhost:8765`.
+- Keep the browser and Python server on the same computer.
 
-### Avatar does not move or is missing
+### Avatar Does Not Move
 
 - Confirm that `frontend/public/models/avatar.fbx` exists.
-- Use a compatible FBX avatar with the expected Mixamo-style bone names.
-- Check the browser developer console for model loading or WebGL errors.
+- Check that the avatar contains the expected skeleton and bone names.
+- Inspect the browser developer console for errors.
+- Verify that live pose messages are arriving from the WebSocket server.
+- Check whether the retargeting code updates the relevant bones on each frame.
 
-### npm or Python command not found
+### Python or npm Command Not Found
 
-- Install Node.js/npm and Python, then open a new terminal so PATH updates are applied.
-- Activate or call the Python virtual environment's executable as shown in the setup instructions.
+- Install Python and Node.js.
+- Reopen the terminal after installation.
+- Use the virtual environment's Python executable as shown above.
+- Run `npm install` from the frontend directory.
 
-## GitHub publishing checklist
+---
 
-- Commit source code, manifests/lockfiles, documentation, and runtime assets only when their licenses permit redistribution.
-- Do not commit `.venv/`, `node_modules/`, local environment files, caches, or generated build output; the root `.gitignore` excludes these.
-- Add a `LICENSE` file before distributing the project. No project license is currently provided.
-- Do not upload private webcam recordings or other personal data.
+## 🔒 Privacy and Asset Licensing
 
-## License
+MotionMirror is designed for local execution. The current architecture does not include a hosted backend.
 
-No license is currently included. All rights remain with their respective owners; add an explicit license before permitting reuse or redistribution.
+- Do not commit private webcam recordings or sensitive personal data.
+- Check the licenses of the avatar, animation, audio, and model assets before redistribution.
+- Keep virtual environments, dependency folders, local configuration files, and generated build output out of Git.
+- Add an explicit project license before permitting others to reuse or redistribute the project.
+
+The absence of a project license does not automatically grant permission to reuse its source code or bundled assets.
+
+---
+
+## 🗺️ Future Improvements
+
+Potential directions for future development include:
+
+- Improving pose smoothing and reducing avatar jitter.
+- Refining 3D joint rotation and skeleton retargeting.
+- Improving tracking during turns and fast movements.
+- Adding configurable avatar skeleton mappings.
+- Experimenting with music-driven movement and beat synchronization.
+- Improving tracking confidence indicators and debugging tools.
+- Evaluating performance across different webcams and hardware configurations.
+
+These are potential enhancements, not claims about currently implemented functionality.
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and suggestions are welcome.
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Make your changes.
+4. Test the Python server and frontend locally.
+5. Submit a pull request describing your changes.
+
+For bug reports, include relevant terminal output, browser console errors, and steps to reproduce the issue. Avoid sharing private webcam recordings.
+
+---
+
+## 📄 License
+
+No project license is currently included.
+
+Add a `LICENSE` file after choosing an appropriate license and confirming that you have the rights to distribute the project code and bundled assets.
+
+---
+
+**MotionMirror** — Bridging real-world movement and browser-based 3D avatars, one frame at a time. 🕺
